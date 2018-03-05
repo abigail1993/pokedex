@@ -1,21 +1,77 @@
+//funcion con la respuesta positiva para manipular su data
+const response = (data) => {
+    console.log('se esta cargando');
+    //console.log(data);
+    let dataPokemon = data.pokemon_entries;
+    //console.log(dataPokemon);
+    infoPokemon(dataPokemon);
+};
 
-function getPokemon (data) {//funcion para entrar a la data
-    console.log(data);// jala toda la data
-    var dataPokemon = data.pokemon_entries;//con esta variable es para jalar solo pokemons
-    console.log(dataPokemon); //muestra array
-    dataPokemon.forEach(function(data) {// recorre el la data
+// funcion con la respuesta de error
+const error = () => {
+    console.log("Trata otra vez");
+};
 
-        var pokemonSpecies = data.pokemon_species;
-        var url = pokemonSpecies.url; //para entrar a la data y se pueda consolear su url
-        var name = pokemonSpecies.name;//para entrar a la data y se pueda consolear su nombre
-        console.log(url, name);
+//funcion para jalar informacion detallada de cada pokemon, de acuerdo al request de la api
+const detailsPokemon = (dataDetail) => {
+    console.log("la solicitud esta hecha");
+    //console.log(data);
+    let name = dataDetail.name;
+    console.log(name);
+    let weight = dataDetail.weight;
+    console.log(weight);
+    let height = dataDetail.height;
+    console.log(height);
+
+};
+
+//función para obtener nombre y url de los pokemon
+const infoPokemon = (dataPokemon) => {
+    dataPokemon.forEach(function(data) {
+        let speciesPokemon = data.pokemon_species;
+        let namePokemons = speciesPokemon.name;
+        //console.log(namePokemons);
+        $.ajax({
+            url: `https://pokeapi.co/api/v2/pokemon/${namePokemons}`,
+        }).done(detailsPokemon).fail(error);
+        paintElements(namePokemons);
+
+        //infoOfEachPokemon(dataPokemon)
     });
 };
 
-//on esto se hace la peticion a ajax tiene el pokeapi
+//funcion para pintar las tarjetas de los pokemon
+const paintElements = (namePokemons) => {
+    //crear elementos con sus clases y atributos
+    let $divCard = $("<div />").addClass("card col-md-3");
+    let $imgPokemon = $("<img />").addClass("card-img-top");
+    let $cardPokemon = $("<div />").addClass("card-body");
+    let $sectionIcons = $("<div />").addClass("icons");
+
+    let $linkModal = $("<a />").attr("href", "#modal");
+    let $nameCard = $("<h5 />").addClass("card-title");
+
+    $linkModal.attr("data-toggle", "modal");
+    $nameCard.text(namePokemons);
+    $imgPokemon.attr("src", "http://dummyimage.com/200x200");
+    $divCard.attr("style", "width: 18rem;");
+
+
+    //agregar elementos hijos a su padre
+    $divCard.append($imgPokemon);
+
+    $sectionIcons.append($linkModal);
+    $cardPokemon.append($sectionIcons);
+    $cardPokemon.append($nameCard);
+    $divCard.append($cardPokemon);
+    $("#card-poke").append($divCard)
+
+    console.log("es correcto");
+
+};
+
+//haciendo la peticion con ajax
 $.ajax({
-  url: `https://pokeapi.co/api/v2/pokedex/1/`
-}).done(getPokemon) //metodo para que jale la api
-
-
-// se tiene que pintar en el html talvez con template y hacer un filtro  que coincida con con la primera letra y pasar a ecma 6
+        url: `https://pokeapi.co/api/v2/pokedex/1/`,
+        data: { limit: 10 }
+    }).done(response) //haciendo el onload de la api,con funciones de respuesta positiva y negativa
